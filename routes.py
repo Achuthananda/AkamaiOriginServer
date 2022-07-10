@@ -1,15 +1,18 @@
+from flask import render_template, request, redirect, url_for, flash
+from flask_app import app, db
 from flask import Flask, jsonify
 from flask import abort
 from flask import make_response
 from flask import request
 from flask import render_template,send_from_directory
 import json
+from flask import render_template, request, redirect, url_for, flash
+from flask_login import login_user, logout_user, login_required, current_user
+from passlib.hash import sha256_crypt
 
-import sys
-if sys.version_info[0] >= 3:
-    unicode = str
-
-app = Flask(__name__,static_url_path='')
+from flask_app import app, db
+from flask_app.models import User, Post
+from flask_app.forms import PostForm
 
 #-------------------------------------------------GENERAL HTTP CALLS------------------------------------------------------------
 @app.route('/')
@@ -31,13 +34,13 @@ def not_found(error):
 def issueredirect301():
     resp = make_response("",301)
     resp.headers['location'] = 'http://www.google.com'
-    return resp  
+    return resp
 
 @app.route('/test302', methods=['GET'])
 def issueredirect302():
     resp = make_response("",302)
     resp.headers['location'] = 'https://www.ndtv.com'
-    return resp  
+    return resp
 
 @app.route('/captureheaders', methods=['GET'])
 def captureheaders():
@@ -49,7 +52,7 @@ def captureheaders():
         tempArray = item.split(':')
         print(tempArray)
         if len(tempArray) == 2:
-            reqDict[tempArray[0]] = tempArray[1].strip('\r')   
+            reqDict[tempArray[0]] = tempArray[1].strip('\r')
 
 
     responseJson = {}
@@ -61,7 +64,7 @@ def captureheaders():
         tempArray = item.split(':')
         print(tempArray)
         if len(tempArray) == 2:
-            respDict[tempArray[0]] = tempArray[1].strip('\r')   
+            respDict[tempArray[0]] = tempArray[1].strip('\r')
 
     responseJson['ReqHeaders'] = reqDict
     responseJson['RespHeaders'] = respDict
@@ -73,25 +76,25 @@ def captureheaders():
 @app.route('/testcustommethod', methods=['KRAMER'])
 def customMethod():
     resp = make_response("This is an output of Custom Method",200)
-    return resp  
+    return resp
 
 @app.route('/testcustomstatus', methods=['GET'])
 def customStatusCode():
     resp = make_response("This is an output of Custom Status Code",777)
-    return resp  
+    return resp
 
 #-------------------------------------------------API METHODS START------------------------------------------------------------
 tasks = [
     {
         'id': 1,
         'title': u'Buy groceries',
-        'description': u'Milk, Cheese, Pizza, Fruit, Tylenol', 
+        'description': u'Milk, Cheese, Pizza, Fruit, Tylenol',
         'done': False
     },
     {
         'id': 2,
         'title': u'Learn Python',
-        'description': u'Need to find a good Python tutorial on the web', 
+        'description': u'Need to find a good Python tutorial on the web',
         'done': False
     }
 ]
@@ -111,7 +114,7 @@ def create_task():
         if task['title'] == newtask['title']:
             found = True
             abort(400,{'message': 'Already the Task Exists in the Database'})
-    
+
     if found == False:
         tasks.append(newtask)
         return jsonify({'task': newtask}), 201
@@ -160,10 +163,10 @@ def get_tasks():
 def get_methods():
     resp = make_response("",204)
     resp.headers['Allow'] = 'OPTIONS,GET,PUT,POST,HEAD,DELETE'
-    return resp  
+    return resp
 
 #-------------------------------------------------DATASTREAM ENDPOINTS START------------------------------------------------------------
-@app.route('/datastream', methods=['GET','POST']) 
+@app.route('/datastream', methods=['GET','POST'])
 def datastreamEP():
     if request.method == 'POST':
         req_data = request.get_data()
@@ -178,7 +181,7 @@ def datastreamEP():
         return resp
 
 #-------------------------------------------------CloudMonitor ENDPOINTS START------------------------------------------------------------
-@app.route('/cloudmonitor', methods=['POST']) 
+@app.route('/cloudmonitor', methods=['POST'])
 def cloudMonEP():
     if request.method == 'POST':
         req_data = request.get_data()
@@ -193,6 +196,3 @@ def cloudMonEP():
 def esi():
     return render_template("esi.html")
 #-------------------------------------------------ESI EndPoints END------------------------------------------------------------
-if __name__ == '__main__':
-    #app.run(debug=True)
-    app.run(debug=True,host='0.0.0.0', port=8000)
