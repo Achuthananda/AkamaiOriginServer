@@ -171,7 +171,7 @@ def datastreamEP():
     if request.method == 'POST':
         req_data = request.get_data()
 
-        with open('dslogs/datastream.txt', 'wb') as outfile:
+        with open('/home/flask_app_project/flask_app/dslogs/datastream.txt', 'wb') as outfile:
             outfile.write(req_data)
         resp = jsonify(success=True)
         return resp
@@ -186,7 +186,7 @@ def cloudMonEP():
     if request.method == 'POST':
         req_data = request.get_data()
 
-        with open('cmlogs/cloudmon.txt', 'wb') as outfile:
+        with open('/home/flask_app_project/flask_app/cmlogs/cloudmon.txt', 'wb') as outfile:
             outfile.write(req_data)
         resp = jsonify(success=True)
         return resp
