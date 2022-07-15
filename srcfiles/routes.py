@@ -195,4 +195,12 @@ def cloudMonEP():
 @app.route('/esitest')
 def esi():
     return render_template("esi.html")
-#-------------------------------------------------ESI EndPoints END------------------------------------------------------------
+#-------------------------------------------------Error Simulation------------------------------------------------------------
+@app.route('/simulaterror')
+def errorindex():
+    raise Exception("Internal Server Error")
+    abort(500)
+
+@app.errorhandler(500)
+def exception_handler(error):
+    return "500 error"
