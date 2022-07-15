@@ -198,9 +198,4 @@ def esi():
 #-------------------------------------------------Error Simulation------------------------------------------------------------
 @app.route('/simulaterror')
 def errorindex():
-    raise Exception("Internal Server Error")
-    abort(500)
-
-@app.errorhandler(500)
-def exception_handler(error):
-    return "500 error"
+    return make_response(jsonify({'error': 'InternalServer Error'}), 501)
